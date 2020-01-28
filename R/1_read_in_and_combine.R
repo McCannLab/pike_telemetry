@@ -1,34 +1,41 @@
-rm(list=ls()) 
-
-setwd("~/Thesis analyses/Chapter 4/Telemetry")
-
-source("1_read_in_vps.R")
-
 library(maptools)
 library(spatstat)
 library(rgdal)
 library(SDMTools)
 library(raster)
+library(tidyverse)
+
+#read in telemetry data
+dat <- read.csv("data/alexie_pike_telemetry_data_raw.csv")
+
+#convert lat long to utm
+dat$utm <- project(cbind(c(as.numeric(dat$lon)), c(as.numeric(dat$lat))), "+proj=utm +zone=11 ellps=WGS84")
 
 #read in shoreline
-shoreOutline<-readShapePoly("Alexie_Outline_Islands.shp", 
-                           verbose=TRUE, 
-                           proj4string=CRS("+proj=longlat +datum=WGS84"))
-shore<-spTransform(shoreOutline, 
-                    CRS("+proj=utm +zone=11 +ellps=WGS84"))
+shore <- readOGR("data/Alexie_Outline_Islands.shp")
+shore <- spTransform(shore, CRS("+proj=utm +zone=11 +ellps=WGS84"))
 
+#remove points that fall outside of lake
+W <- as.owin(shore) #create bound/window
+isin <- inside.owin(x=dat$utm[,1], y=dat$utm[,2], w=W)
+vps_in <- dat[isin,] #retain only those inside lake
+vps_out <- dat[!isin,] #keep those outside lake for later
 
-#read in bathy
-bathy<-read.asc("bathy.asc")
+data <- vps_in
+total_vps <- nrow(dat)
+outside_lake <- nrow(vps_in)
+rm(vps_in, dat, dat1, vps_out)
+
+#read in bathymetry map
+bathy<-read.asc("data/bathy.asc")
 bathy<-raster.from.asc(bathy)
-plot(bathy)
-points(dat$utm)
 
-#project fish data
-dat$lon<-as.numeric(dat$lon)
-dat$lat<-as.numeric(dat$lat)
-dat$utm<-project(cbind(c(dat$lon), c(dat$lat)), 
-                   "+proj=utm +zone=11 ellps=WGS84")
+#add bathy depth to each position
+data<-data.frame(cbind(data,extract(bathy, data$utm)))
+colnames(data)[10]<-"bathy_depth"
+data$bathy_depth<-data$bathy_depth*-1
+data$depth<-round(data$depth, 1)
+data$under<-data$bathy_depth-data$depth
 
 #check if any above or below lake
 dat<-dat[!is.na(dat$depth),]
