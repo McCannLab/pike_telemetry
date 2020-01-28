@@ -42,10 +42,10 @@ dat <- read_csv("data/alexie_pike_telemetry_data_raw.csv") %>%
 
 # Spatial Filtering (remove data point outside of the lakes)
 id <- st_contains(lk, dat, sparse = FALSE)  
-dat2 <- dat[id,]
+dat2 <- dat[as.vector(id),]
 
 # Address potential depth errors max depth = 32m ; error_max = 1.7
-dat2 <- dat2 %>% filter(depth > -1.7 & depth < 33.7 )  
+dat2$depth[dat2$depth < -1.7 | dat2$depth > 33.7] <- NA 
 # actually there are none below -1.7 and >50000 over 33.7
 dat2$depth[dat2$depth < 0] <- 0 # 1010 cases
 dat2$depth[dat2$depth < 33.7 & dat2$depth > 32] <- 32
@@ -87,7 +87,7 @@ tmp_sunrise <- sun[c(1, 2*1:12)]
 sunval <- get_sun(tmp_sunrise)
 tmp_sunset <- sun[c(1, 2*1:12 + 1)]
 sunset <- get_sun(tmp_sunset)
-sunval$sunset<- sunset$sunrise
+sunval$sunset <- sunset$sunrise
 names(sunval)[4] <- "sunset"
 
 dat2$depth_raw <- dat2$depth
@@ -113,9 +113,5 @@ for (i in seq_along(dat4)) {
     res[[i]] <- res[[i]][res[[i]]$date > bef[k],] 
 }
 
-res3 <- lapply(res2, function(x) {rownames(x)<-NULL; x })
-
-## 
-rbindnr <- function(x) rbind(x, make.row.names = FALSE) 
-datf <- do.call(rbindnr, res2)
+datf <- do.call(rbind, res)
 saveRDS(datf, file = "datf.rds")
