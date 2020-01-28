@@ -1,0 +1,27 @@
+Package: pike_telemetry
+Type: Research Compendium
+Title: Pike Telemetry
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Kevin", "Cazelles", role = c("aut", "cre"), email = "kevin.cazelles@gmail.com", comment = c(ORCID = "0000-0001-6619-9874")),
+    person("Matt", "Guzzo", role = c("aut")),
+    person("Timothy", "Bartley")
+    )
+Description: Data, code and figures for DOI: XXX 
+License: MIT + file LICENSE
+Depends:
+  R (>= 3.1.0)
+Imports:
+    anytime,
+    dplyr,
+    magrittr,
+    raster,
+    readr,
+    sf,
+    tibble,
+    tidyr
+Encoding: UTF-8
+RoxygenNote: 7.0.2
+Suggests: knitr, testthat, tibble, rmarkdown, rworldmap
+VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
