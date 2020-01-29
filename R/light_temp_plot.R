@@ -43,7 +43,7 @@ ggplot(ec, aes(x=date, y=mean_temp, colour=mean_temp))+
   geom_point()+
   scale_x_date(date_break = "4 month", date_labels = "%b %Y") +
   theme_bw(base_size=20)+
-  ylab("Daily air temperature (°C)")+
+  ylab("Daily air temperature (ï¿½C)")+
   xlab("Date")+
   theme(axis.text.x = element_text(colour = 'black'),
         axis.text.y = element_text(colour = 'black'))+
