@@ -1,9 +1,9 @@
 library(tidyverse)
 
 air_temp <- read_csv("")
-day_len <- read_csv("sunrise_sunset.csv")
-water_temp <- read_csv("temp_string_32_interp.csv")
-water_light <- read_csv("interpolated_light_data.csv")
+day_len <- read_csv("data/sunrise_sunset.csv")
+water_temp <- read_csv("data/temp_string_32_interp.csv")
+water_light <- read_csv("data/interpolated_light_data.csv")
 
 
 # lake temperature profile
