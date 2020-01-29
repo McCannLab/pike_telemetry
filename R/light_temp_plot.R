@@ -5,7 +5,6 @@ library(lubridate)
 library(ggpubr)
 
 
-
 ### import and manipulate data -------
 
 air_temp <- read_csv("data/yk_air_temp_entire_study.csv") %>%
@@ -121,4 +120,5 @@ ggsave(filename = "figures/multiplot.tiff",
   plot = multiplot,
   width = 16,
   height = 12,
-  dpi = "print")
+  dpi = "print",
+  compression = "lzw")
