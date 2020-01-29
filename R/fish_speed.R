@@ -13,7 +13,8 @@ fish_speed <- function(x, max_speed = 38.5) {
     x$dt = c(NA, as.numeric(tim))
     x$speed = c(NA, dis/as.numeric(tim))
     #
-    x[x$dt<=20 & x$speed <= max_speed,]
+    x$speed[x$dt > 20 | x$speed > max_speed] <- NA 
+    x
 }
 
 
