@@ -90,6 +90,8 @@ sunset <- get_sun(tmp_sunset)
 sunval$sunset<- sunset$sunrise
 names(sunval)[4] <- "sunset"
 
+write.csv(sunval, "data/sunrise_sunset.csv", row.names = F)
+
 dat2$depth_raw <- dat2$depth
 dat2$depth <- round(dat2$depth, 1)
 
