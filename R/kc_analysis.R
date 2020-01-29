@@ -47,6 +47,7 @@ dat0 <- read_csv("data/alexie_pike_telemetry_data_raw.csv") %>%
     st_transform(lk, crs = 26911)
 
 # Spatial Filtering (remove data point outside of the lakes)
+<<<<<<< HEAD
 dat1 <- dat0[st_contains(lk, dat0, sparse = FALSE),]
 
 # Add distance to shore
@@ -64,6 +65,13 @@ dat1$lightson[dat1$time < dat1$sunset & dat1$time > dat1$sunrise] <- 1
 
 # Address potential depth errors max depth = 32m ; error_max = 1.7
 dat1$depth[dat1$depth < -1.7 | dat1$depth > 33.7] <- NA 
+=======
+id <- st_contains(lk, dat, sparse = FALSE)  
+dat2 <- dat[id,]
+
+# Address potential depth errors max depth = 32m ; error_max = 1.7
+dat2 <- dat2 %>% filter(depth > -1.7 & depth < 33.7 )  
+>>>>>>> master
 # actually there are none below -1.7 and >50000 over 33.7
 dat1$depth[dat1$depth < 0] <- 0 # 1010 cases
 dat1$depth[dat1$depth < 33.7 & dat1$depth > 32] <- 32
@@ -73,8 +81,55 @@ dat1$bathy <- -raster::extract(bat, dat1)
 dat1$hard <- -raster::extract(har, dat1)
 dat1$subs <- -raster::extract(sub, dat1)
 # Format date and time data
+<<<<<<< HEAD
 dat1$date <- anydate(dat1$datetime)
 dat1$hour <- strftime(dat1$datetime, format = "%H")
+=======
+dat2$date <- anydate(dat2$datetime)
+dat2$year <- strftime(dat2$date, format = "%y")
+dat2$month <- strftime(dat2$date, format = "%m")
+dat2$day <- strftime(dat2$date, format = "%d")
+dat2$time <- strftime(dat2$datetime, format = "%H:%M:%S")
+dat2$hour <- strftime(dat2$datetime, format = "%H")
+
+## ice on / ice off 
+dat2$ice <- TRUE 
+dat2$ice[dat2$datetime < as.Date("2012-10-31")] <- FALSE
+dat2$ice[dat2$datetime > as.Date("2014-05-29")] <- FALSE
+dat2$ice[dat2$datetime > as.Date("2013-05-27") & 
+    dat2$datetime < as.Date("2013-11-09")] <- FALSE
+
+# visual checks
+# plot(st_geometry(dat2))
+# plot(st_geometry(lk), add=T, lwd = 4, border = 2)   
+
+# Format sunset surise and depth 
+get_sun <- function(x) {
+    names(x)[1 + 1:12] <- 1:12
+    out <- gather(x, key = month, value = sunrise, -Day)
+    names(out)[1] <- "day"
+    out$month <- sprintf("%02d", as.numeric(out$month))
+    out$day <- sprintf("%02d", out$day)
+    out
+}
+
+tmp_sunrise <- sun[c(1, 2*1:12)]
+sunval <- get_sun(tmp_sunrise)
+tmp_sunset <- sun[c(1, 2*1:12 + 1)]
+sunset <- get_sun(tmp_sunset)
+sunval$sunset<- sunset$sunrise
+names(sunval)[4] <- "sunset"
+
+dat2$depth_raw <- dat2$depth
+dat2$depth <- round(dat2$depth, 1)
+
+
+# Merging light, depth, sunset and surise
+dat3 <- dat2 %>%
+    left_join(light, by = c("date","depth")) %>% 
+    left_join(temp, by = c("date","depth"))  %>% 
+    left_join(sunval, by = c("day","month"))
+>>>>>>> master
 
 # Format depth 
 dat1$depth_raw <- dat1$depth
@@ -157,6 +212,14 @@ datf <- datf %>% left_join(lit_temp)
 # data recorder (if>.5 mean most of observation are when light is on)
 datf$lightson_mean
 
+<<<<<<< HEAD
+=======
+res3 <- lapply(res2, function(x) {rownames(x)<-NULL; x })
+
+## 
+rbindnr <- function(x) rbind(x, make.row.names = FALSE) 
+datf <- do.call(rbindnr, res2)
+>>>>>>> master
 saveRDS(datf, file = "datf.rds")
 
 
