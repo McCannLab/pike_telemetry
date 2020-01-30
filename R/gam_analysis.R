@@ -2,10 +2,16 @@ library(mgcv)
 library(tidyverse)
 
 dat <- readRDS("datf.rds")
+<<<<<<< Updated upstream
+=======
+dat2 <- dat %>% filter(!is.nan(speed_mean))
+>>>>>>> Stashed changes
 
 dat$hour <- as.integer(dat$hour)
 dat$fish_id <- as.factor(dat$fish_id)
 dat$lightson_mean <- as.factor(dat$lightson_mean)
+dat$month <- as.integer(dat$month)
+dat$season <- as.factor(dat$season)
 
 dat2 <- dat %>% filter(!is.nan(speed_mean))
 
@@ -28,9 +34,14 @@ summary(temp_mod)
 
 hist(sqrt(dat2$speed_mean))
 
-activity_mod <- bam(sqrt(speed_mean) ~ s(hour, k = 24, bs = "cc") + season + lit_temp + lightson_mean +
+activity_mod <- bam(sqrt(speed_mean) ~ s(hour, k = 24, bs = "cc") + season + 
+                      lit_temp + lightson_mean +
                   + s(fish_id, k = 10, bs = "re"),
+<<<<<<< Updated upstream
                 knots = list(hour = c(0, 23)), method = "REML", family = "gaussian", data = dat2)
+=======
+                knots = list(hour = c(0, 23), month = c(1, 12)), method = "REML", family = "gaussian", data = dat)
+>>>>>>> Stashed changes
 summary(activity_mod)
 
 hist(sqrt(dat2$dis_2_shore_mean))
